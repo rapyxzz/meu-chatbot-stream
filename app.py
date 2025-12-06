@@ -47,15 +47,15 @@ def get_history_for_api():
         if role not in ["user", "model"]:
             continue
             
-        # 3. Garante que o conteúdo é uma string válida antes de passá-lo para a API
-        if content is None or not isinstance(content, str) or not content.strip():
+        # 3. Garante que o conteúdo é uma string válida
+        if content is None or not str(content).strip():
             continue
             
         api_history.append(
             types.Content(
                 role=role,
-                # Usa o content diretamente (já é uma string validada)
-                parts=[types.Part.from_text(content)] 
+                # 🚨 SOLUÇÃO: Força a conversão para string novamente (redundante, mas necessária)
+                parts=[types.Part.from_text(str(content))] 
             )
         )
     return api_history
@@ -131,5 +131,6 @@ if st.session_state.editing:
     )
     
     st.button("✅ Salvar Edição e Continuar", on_click=update_and_save_edit)
+
 
 
