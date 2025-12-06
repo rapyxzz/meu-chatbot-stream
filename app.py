@@ -1,6 +1,6 @@
 import streamlit as st
 from google import genai
-from google-genai import types
+from google.genai import types 
 import os
 
 # --- Configuração Inicial ---
@@ -117,3 +117,4 @@ if st.session_state.editing:
     
 
     st.button("✅ Salvar Edição e Continuar", on_click=update_and_save_edit)
+
