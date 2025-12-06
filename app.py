@@ -82,8 +82,16 @@ for message in st.session_state.messages:
 
 # --- Lógica de Chat ---
 
+# --- Lógica de Chat (CORRIGIDO) ---
+
 if not st.session_state.editing:
     if prompt := st.chat_input("Diga algo..."):
+        
+        # 🚨 CORREÇÃO: Limpa o histórico se for a primeira mensagem,
+        # prevenindo objetos de estado inválidos.
+        if not st.session_state.messages:
+            st.session_state.messages = []
+            
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         with st.chat_message("user"):
@@ -131,6 +139,7 @@ if st.session_state.editing:
     )
     
     st.button("✅ Salvar Edição e Continuar", on_click=update_and_save_edit)
+
 
 
 
