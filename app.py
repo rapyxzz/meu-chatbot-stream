@@ -32,7 +32,7 @@ if "editing" not in st.session_state:
     st.session_state.editing = False
 
 def get_history_for_api():
-    """Formata o histórico de mensagens para a API do Gemini, garantindo a validade dos dados."""
+    """Formata o histórico de mensagens para a API do Gemini, usando um método mais estável de criação de Content."""
     api_history = []
     for msg in st.session_state.messages:
         
@@ -51,11 +51,11 @@ def get_history_for_api():
         if content is None or not str(content).strip():
             continue
             
+        # 🚨 SOLUÇÃO FINAL: Cria o Content diretamente usando string, evitando o erro de tipo no Part.
         api_history.append(
             types.Content(
                 role=role,
-                # Usa a string validada
-                parts=[types.Part.from_text(str(content))] 
+                parts=[content] # Passa o conteúdo como string, e a biblioteca deve convertê-lo
             )
         )
     return api_history
@@ -139,6 +139,7 @@ if st.session_state.editing:
     )
     
     st.button("✅ Salvar Edição e Continuar", on_click=update_and_save_edit)
+
 
 
 
