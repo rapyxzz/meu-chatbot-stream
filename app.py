@@ -1,6 +1,6 @@
 import streamlit as st
 from google import genai
-from google.genai import types 
+from google.genai import types
 import os
 
 # --- Configuração Inicial ---
@@ -32,14 +32,20 @@ if "editing" not in st.session_state:
     st.session_state.editing = False
 
 def get_history_for_api():
-    """Formata o histórico de mensagens para a API do Gemini."""
+    """Formata o histórico de mensagens para a API do Gemini, ignorando mensagens vazias."""
     api_history = []
     for msg in st.session_state.messages:
+        content = msg.get("content")
+        
+        # Garante que o conteúdo não é None ou string vazia antes de formatar para a API
+        if content is None or not str(content).strip():
+            continue 
+            
         if msg["role"] in ["user", "model"]:
             api_history.append(
                 types.Content(
                     role=msg["role"],
-                    parts=[types.Part.from_text(msg["content"])]
+                    parts=[types.Part.from_text(str(content))]
                 )
             )
     return api_history
@@ -115,6 +121,4 @@ if st.session_state.editing:
         height=200
     )
     
-
     st.button("✅ Salvar Edição e Continuar", on_click=update_and_save_edit)
-
