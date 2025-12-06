@@ -32,24 +32,29 @@ if "editing" not in st.session_state:
     st.session_state.editing = False
 
 def get_history_for_api():
-    """Formata o histórico de mensagens para a API do Gemini, ignorando mensagens vazias."""
+    """Formata o histórico de mensagens para a API do Gemini, garantindo a validade dos dados."""
     api_history = []
     for msg in st.session_state.messages:
-        content = msg.get("content")
         
-        # Garante que o conteúdo não é None ou string vazia antes de formatar para a API
-        if content is None or not str(content).strip():
+        # 🚨 CORREÇÃO: Garante que o item do histórico é um dicionário válido
+        if not isinstance(msg, dict):
+            continue 
+
+        content = msg.get("content")
+        role = msg.get("role")
+        
+        # Garante que o conteúdo e a função (role) existem e o conteúdo não é vazio
+        if content is None or not str(content).strip() or role not in ["user", "model"]:
             continue 
             
-        if msg["role"] in ["user", "model"]:
-            api_history.append(
-                types.Content(
-                    role=msg["role"],
-                    parts=[types.Part.from_text(str(content))]
-                )
+        api_history.append(
+            types.Content(
+                role=role,
+                # Garante que o conteúdo é uma string antes de passá-lo
+                parts=[types.Part.from_text(str(content))]
             )
+        )
     return api_history
-
 def update_and_save_edit():
     """Salva a edição feita pelo usuário e desativa o modo de edição."""
     if st.session_state.messages and st.session_state.messages[-1]["role"] == "model":
@@ -122,3 +127,4 @@ if st.session_state.editing:
     )
     
     st.button("✅ Salvar Edição e Continuar", on_click=update_and_save_edit)
+
